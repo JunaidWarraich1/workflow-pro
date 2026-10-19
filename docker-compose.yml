@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database Container
+  db:
+    image: postgres:17
+    container_name: workflow_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: workflow_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. FastAPI Backend Container
+  backend:
+    build: ./backend
+    container_name: workflow_backend
+    restart: always
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgrespassword@db:5432/workflow_db
+      - SECRET_KEY=docker_secret_key_workflow_pro_2026
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
