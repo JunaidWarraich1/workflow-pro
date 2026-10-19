@@ -257,6 +257,15 @@ def award_contract(proposal_id: int, user: models.User = Depends(get_current_use
     ).all()
     for item in competitors:
         item.status = "rejected"
+
+    db.commit()
+    return {
+        "message": "Contract successfully awarded.",
+        "accepted_freelancer": selected.freelancer.full_name,
+        "job_title": selected.job.title,
+        "agreed_budget": selected.bid_amount
+    }
+
 # ─── REJECT PROPOSAL ENDPOINT ───
 @app.put("/proposals/{proposal_id}/reject")
 def reject_proposal(proposal_id: int, user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
