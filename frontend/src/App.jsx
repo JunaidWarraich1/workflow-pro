@@ -5,6 +5,7 @@ const API_BASE = "https://workflow-pro-1hg4.vercel.app";
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user") || "null"));
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
   // Authentication State
   const [isRegister, setIsRegister] = useState(false);
@@ -39,6 +40,35 @@ export default function App() {
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: "", type: "info" }), 4000);
+  };
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+  };
+
+  // Color Tokens based on Theme
+  const isDark = theme === "dark";
+  const colors = {
+    bg: isDark ? "#08090c" : "#f8fafc",
+    cardBg: isDark ? "#0e1017" : "#ffffff",
+    inputBg: isDark ? "#060709" : "#f1f5f9",
+    border: isDark ? "rgba(255, 255, 255, 0.08)" : "#e2e8f0",
+    textPrimary: isDark ? "#ffffff" : "#0f172a",
+    textSecondary: isDark ? "#94a3b8" : "#64748b",
+    textMuted: isDark ? "#64748b" : "#94a3b8",
+    headerBg: isDark ? "rgba(8, 9, 12, 0.85)" : "rgba(255, 255, 255, 0.85)",
+    accentBtn: isDark
+      ? "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)"
+      : "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)",
+    budgetColor: isDark ? "#34d399" : "#059669",
+    modalOverlay: isDark ? "rgba(0, 0, 0, 0.8)" : "rgba(15, 23, 42, 0.6)",
+    secondaryBtnBg: isDark ? "transparent" : "#f1f5f9",
+    secondaryBtnText: isDark ? "#94a3b8" : "#475569",
+    cardShadow: isDark
+      ? "0 4px 20px rgba(0, 0, 0, 0.35)"
+      : "0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.07)"
   };
 
   // Fetch Jobs
@@ -243,22 +273,23 @@ export default function App() {
   return (
     <div style={{
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      backgroundColor: "#08090c",
+      backgroundColor: colors.bg,
       minHeight: "100vh",
-      color: "#f1f5f9",
-      letterSpacing: "-0.012em"
+      color: colors.textPrimary,
+      letterSpacing: "-0.012em",
+      transition: "background-color 0.2s ease, color 0.2s ease"
     }}>
 
       {/* TOAST NOTIFICATION */}
       {toast.show && (
         <div style={{
           position: "fixed", bottom: "28px", right: "28px", zIndex: 1000,
-          backgroundColor: toast.type === "error" ? "rgba(220, 38, 38, 0.95)" : toast.type === "info" ? "rgba(30, 41, 59, 0.95)" : "rgba(16, 185, 129, 0.95)",
-          color: "#ffffff",
-          border: `1px solid ${toast.type === "error" ? "#ef4444" : toast.type === "info" ? "#475569" : "#10b981"}`,
+          backgroundColor: toast.type === "error" ? "rgba(220, 38, 38, 0.95)" : toast.type === "info" ? (isDark ? "rgba(30, 41, 59, 0.95)" : "rgba(241, 245, 249, 0.95)") : "rgba(16, 185, 129, 0.95)",
+          color: toast.type === "info" && !isDark ? "#0f172a" : "#ffffff",
+          border: `1px solid ${toast.type === "error" ? "#ef4444" : toast.type === "info" ? colors.border : "#10b981"}`,
           backdropFilter: "blur(12px)",
           padding: "12px 22px", borderRadius: "8px", fontSize: "13px", fontWeight: "500",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.6)",
+          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.4)",
           display: "flex", alignItems: "center", gap: "10px"
         }}>
           <span>{toast.message}</span>
@@ -267,10 +298,11 @@ export default function App() {
 
       {/* NAVBAR */}
       <header style={{
-        borderBottom: "1px solid rgba(255, 255, 255, 0.07)",
-        backgroundColor: "rgba(8, 9, 12, 0.8)",
+        borderBottom: `1px solid ${colors.border}`,
+        backgroundColor: colors.headerBg,
         backdropFilter: "blur(16px)",
-        position: "sticky", top: 0, zIndex: 50
+        position: "sticky", top: 0, zIndex: 50,
+        transition: "all 0.2s ease"
       }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
@@ -278,16 +310,17 @@ export default function App() {
               width: "28px", height: "28px",
               background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
               borderRadius: "7px", display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 0 15px rgba(99, 102, 241, 0.4)",
+              boxShadow: isDark ? "0 0 15px rgba(99, 102, 241, 0.4)" : "0 2px 8px rgba(99, 102, 241, 0.25)",
               color: "#ffffff", fontWeight: "700", fontSize: "15px"
             }}>
               W
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontWeight: "600", fontSize: "16px", color: "#ffffff", letterSpacing: "-0.02em" }}>WorkFlow</span>
+              <span style={{ fontWeight: "600", fontSize: "16px", color: colors.textPrimary, letterSpacing: "-0.02em" }}>WorkFlow</span>
               <span style={{
-                fontSize: "10px", fontWeight: "600", color: "#818cf8",
-                backgroundColor: "rgba(99, 102, 241, 0.12)", border: "1px solid rgba(99, 102, 241, 0.25)",
+                fontSize: "10px", fontWeight: "600", color: "#6366f1",
+                backgroundColor: isDark ? "rgba(99, 102, 241, 0.12)" : "rgba(99, 102, 241, 0.08)",
+                border: isDark ? "1px solid rgba(99, 102, 241, 0.25)" : "1px solid rgba(99, 102, 241, 0.2)",
                 padding: "2px 7px", borderRadius: "10px"
               }}>
                 PRO
@@ -295,35 +328,48 @@ export default function App() {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            {/* THEME TOGGLE BUTTON */}
+            <button
+              onClick={toggleTheme}
+              style={{
+                backgroundColor: colors.secondaryBtnBg,
+                color: colors.secondaryBtnText,
+                border: `1px solid ${colors.border}`,
+                padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: "6px"
+              }}
+              title="Toggle Light / Dark mode"
+            >
+              <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
+            </button>
+
             {user ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                <span style={{ fontSize: "13px", color: "#cbd5e1", fontWeight: "500" }}>{user.fullName}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "13px", color: colors.textSecondary, fontWeight: "500" }}>{user.fullName}</span>
                 <span style={{
                   fontSize: "10px", fontWeight: "600", textTransform: "uppercase", padding: "3px 9px", borderRadius: "12px",
                   border: user.role === "client" ? "1px solid rgba(99, 102, 241, 0.4)" : "1px solid rgba(16, 185, 129, 0.4)",
-                  color: user.role === "client" ? "#a5b4fc" : "#6ee7b7",
-                  backgroundColor: user.role === "client" ? "rgba(99, 102, 241, 0.1)" : "rgba(16, 185, 129, 0.1)"
+                  color: user.role === "client" ? (isDark ? "#a5b4fc" : "#4f46e5") : (isDark ? "#6ee7b7" : "#059669"),
+                  backgroundColor: user.role === "client" ? "rgba(99, 102, 241, 0.08)" : "rgba(16, 185, 129, 0.08)"
                 }}>
                   {user.role}
                 </span>
                 <button
                   onClick={handleLogout}
                   style={{
-                    backgroundColor: "transparent", color: "#94a3b8", border: "1px solid rgba(255, 255, 255, 0.1)",
-                    padding: "6px 14px", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer",
+                    backgroundColor: "transparent", color: colors.textSecondary, border: `1px solid ${colors.border}`,
+                    padding: "6px 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer",
                     transition: "all 0.15s ease"
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = "#ffffff"; e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.25)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"; }}
                 >
                   Sign Out
                 </button>
               </div>
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10b981", boxShadow: "0 0 8px #10b981", display: "inline-block" }}></span>
-                <span style={{ fontSize: "12px", color: "#94a3b8" }}>Cloud Services Active</span>
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10b981", display: "inline-block" }}></span>
+                <span style={{ fontSize: "12px", color: colors.textSecondary }}>Live Cloud</span>
               </div>
             )}
           </div>
@@ -336,57 +382,60 @@ export default function App() {
         {/* METRICS ROW */}
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px", marginBottom: "36px" }}>
           <div style={{
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            backgroundColor: "#0e1017",
+            border: `1px solid ${colors.border}`,
+            backgroundColor: colors.cardBg,
             padding: "24px", borderRadius: "10px",
-            boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.5)"
+            boxShadow: colors.cardShadow,
+            transition: "all 0.2s ease"
           }}>
-            <span style={{ fontSize: "11px", color: "#64748b", textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.06em" }}>Active Listings</span>
-            <div style={{ fontSize: "32px", fontWeight: "700", color: "#ffffff", marginTop: "6px", letterSpacing: "-0.03em" }}>{jobs.length}</div>
+            <span style={{ fontSize: "11px", color: colors.textMuted, textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.06em" }}>Active Listings</span>
+            <div style={{ fontSize: "32px", fontWeight: "700", color: colors.textPrimary, marginTop: "6px", letterSpacing: "-0.03em" }}>{jobs.length}</div>
           </div>
 
           <div style={{
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            backgroundColor: "#0e1017",
+            border: `1px solid ${colors.border}`,
+            backgroundColor: colors.cardBg,
             padding: "24px", borderRadius: "10px",
-            boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.5)"
+            boxShadow: colors.cardShadow,
+            transition: "all 0.2s ease"
           }}>
-            <span style={{ fontSize: "11px", color: "#64748b", textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.06em" }}>Marketplace Volume</span>
-            <div style={{ fontSize: "32px", fontWeight: "700", color: "#34d399", marginTop: "6px", letterSpacing: "-0.03em" }}>
+            <span style={{ fontSize: "11px", color: colors.textMuted, textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.06em" }}>Marketplace Volume</span>
+            <div style={{ fontSize: "32px", fontWeight: "700", color: colors.budgetColor, marginTop: "6px", letterSpacing: "-0.03em" }}>
               PKR {totalMarketVolume.toLocaleString()}
             </div>
           </div>
 
           <div style={{
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            backgroundColor: "#0e1017",
+            border: `1px solid ${colors.border}`,
+            backgroundColor: colors.cardBg,
             padding: "24px", borderRadius: "10px",
-            boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.5)"
+            boxShadow: colors.cardShadow,
+            transition: "all 0.2s ease"
           }}>
-            <span style={{ fontSize: "11px", color: "#64748b", textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.06em" }}>Infrastructure Stack</span>
-            <div style={{ fontSize: "12px", color: "#cbd5e1", marginTop: "12px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              <span style={{ backgroundColor: "rgba(99, 102, 241, 0.12)", border: "1px solid rgba(99, 102, 241, 0.3)", color: "#a5b4fc", padding: "3px 8px", borderRadius: "5px" }}>FastAPI</span>
-              <span style={{ backgroundColor: "rgba(56, 189, 248, 0.12)", border: "1px solid rgba(56, 189, 248, 0.3)", color: "#7dd3fc", padding: "3px 8px", borderRadius: "5px" }}>PostgreSQL 17</span>
-              <span style={{ backgroundColor: "rgba(168, 85, 247, 0.12)", border: "1px solid rgba(168, 85, 247, 0.3)", color: "#d8b4fe", padding: "3px 8px", borderRadius: "5px" }}>React Vite</span>
-              <span style={{ backgroundColor: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", color: "#6ee7b7", padding: "3px 8px", borderRadius: "5px" }}>AWS Neon</span>
+            <span style={{ fontSize: "11px", color: colors.textMuted, textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.06em" }}>Architecture</span>
+            <div style={{ fontSize: "12px", color: colors.textSecondary, marginTop: "12px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              <span style={{ backgroundColor: isDark ? "rgba(99, 102, 241, 0.12)" : "rgba(99, 102, 241, 0.08)", border: `1px solid ${colors.border}`, color: isDark ? "#a5b4fc" : "#4f46e5", padding: "3px 8px", borderRadius: "5px" }}>FastAPI</span>
+              <span style={{ backgroundColor: isDark ? "rgba(56, 189, 248, 0.12)" : "rgba(56, 189, 248, 0.08)", border: `1px solid ${colors.border}`, color: isDark ? "#7dd3fc" : "#0284c7", padding: "3px 8px", borderRadius: "5px" }}>PostgreSQL 17</span>
+              <span style={{ backgroundColor: isDark ? "rgba(168, 85, 247, 0.12)" : "rgba(168, 85, 247, 0.08)", border: `1px solid ${colors.border}`, color: isDark ? "#d8b4fe" : "#7e22ce", padding: "3px 8px", borderRadius: "5px" }}>React Vite</span>
+              <span style={{ backgroundColor: isDark ? "rgba(16, 185, 129, 0.12)" : "rgba(16, 185, 129, 0.08)", border: `1px solid ${colors.border}`, color: isDark ? "#6ee7b7" : "#059669", padding: "3px 8px", borderRadius: "5px" }}>AWS Neon</span>
             </div>
           </div>
         </section>
 
-        {/* AUTH CARD (IF NOT SIGNED IN) */}
+        {/* AUTH CARD */}
         {!user && (
           <section style={{
             maxWidth: "400px", margin: "60px auto",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            backgroundColor: "#0e1017",
+            border: `1px solid ${colors.border}`,
+            backgroundColor: colors.cardBg,
             borderRadius: "12px", padding: "36px",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)"
+            boxShadow: colors.cardShadow
           }}>
             <div style={{ marginBottom: "26px" }}>
-              <h2 style={{ fontSize: "20px", fontWeight: "600", color: "#ffffff", margin: "0 0 6px 0", letterSpacing: "-0.02em" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: "600", color: colors.textPrimary, margin: "0 0 6px 0", letterSpacing: "-0.02em" }}>
                 {isRegister ? "Create Account" : "Welcome Back"}
               </h2>
-              <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>
+              <p style={{ fontSize: "13px", color: colors.textMuted, margin: 0 }}>
                 {isRegister ? "Join the freelance contract network" : "Sign in to manage projects and bids"}
               </p>
             </div>
@@ -395,22 +444,22 @@ export default function App() {
               {isRegister && (
                 <>
                   <div>
-                    <label style={{ fontSize: "11px", fontWeight: "600", color: "#94a3b8", display: "block", marginBottom: "6px", letterSpacing: "0.04em" }}>FULL NAME</label>
+                    <label style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, display: "block", marginBottom: "6px" }}>FULL NAME</label>
                     <input
                       type="text"
                       placeholder="e.g. Junaid Warraich"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
-                      style={{ width: "100%", padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "7px", color: "#ffffff", fontSize: "13px", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px", boxSizing: "border-box" }}
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: "11px", fontWeight: "600", color: "#94a3b8", display: "block", marginBottom: "6px", letterSpacing: "0.04em" }}>ACCOUNT TYPE</label>
+                    <label style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, display: "block", marginBottom: "6px" }}>ACCOUNT TYPE</label>
                     <select
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
-                      style={{ width: "100%", padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "7px", color: "#ffffff", fontSize: "13px", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px", boxSizing: "border-box" }}
                     >
                       <option value="freelancer">Freelancer (Submit Proposals)</option>
                       <option value="client">Client (Publish Projects & Hire)</option>
@@ -420,26 +469,26 @@ export default function App() {
               )}
 
               <div>
-                <label style={{ fontSize: "11px", fontWeight: "600", color: "#94a3b8", display: "block", marginBottom: "6px", letterSpacing: "0.04em" }}>EMAIL ADDRESS</label>
+                <label style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, display: "block", marginBottom: "6px" }}>EMAIL ADDRESS</label>
                 <input
                   type="email"
                   placeholder="name@domain.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{ width: "100%", padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "7px", color: "#ffffff", fontSize: "13px", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px", boxSizing: "border-box" }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: "11px", fontWeight: "600", color: "#94a3b8", display: "block", marginBottom: "6px", letterSpacing: "0.04em" }}>PASSWORD</label>
+                <label style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, display: "block", marginBottom: "6px" }}>PASSWORD</label>
                 <input
                   type="password"
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  style={{ width: "100%", padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "7px", color: "#ffffff", fontSize: "13px", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px", boxSizing: "border-box" }}
                 />
               </div>
 
@@ -447,23 +496,22 @@ export default function App() {
                 type="submit"
                 style={{
                   marginTop: "8px",
-                  background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                  background: colors.accentBtn,
                   color: "#ffffff", fontWeight: "600",
                   padding: "12px", borderRadius: "7px", border: "none", fontSize: "13px", cursor: "pointer",
-                  boxShadow: "0 4px 14px rgba(99, 102, 241, 0.35)",
-                  transition: "opacity 0.15s ease"
+                  boxShadow: "0 4px 14px rgba(99, 102, 241, 0.35)"
                 }}
               >
                 {isRegister ? "Create Account" : "Continue"}
               </button>
             </form>
 
-            <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid rgba(255, 255, 255, 0.07)", textAlign: "center" }}>
-              <span style={{ fontSize: "12px", color: "#64748b" }}>
+            <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: `1px solid ${colors.border}`, textAlign: "center" }}>
+              <span style={{ fontSize: "12px", color: colors.textMuted }}>
                 {isRegister ? "Have an account?" : "Need an account?"}{" "}
                 <button
                   onClick={() => setIsRegister(!isRegister)}
-                  style={{ background: "none", border: "none", color: "#818cf8", fontWeight: "600", cursor: "pointer", fontSize: "12px", padding: 0 }}
+                  style={{ background: "none", border: "none", color: "#6366f1", fontWeight: "600", cursor: "pointer", fontSize: "12px", padding: 0 }}
                 >
                   {isRegister ? "Sign in" : "Register"}
                 </button>
@@ -475,17 +523,17 @@ export default function App() {
         {/* LOGGED IN DASHBOARD */}
         {user && (
           <div>
-            {/* POST PROJECT FORM (CLIENT ONLY) */}
+            {/* POST PROJECT (CLIENTS) */}
             {user.role === "client" && (
               <section style={{
-                border: "1px solid rgba(255, 255, 255, 0.08)",
-                backgroundColor: "#0e1017",
+                border: `1px solid ${colors.border}`,
+                backgroundColor: colors.cardBg,
                 borderRadius: "10px", padding: "26px", marginBottom: "36px",
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.4)"
+                boxShadow: colors.cardShadow
               }}>
                 <div style={{ marginBottom: "18px" }}>
-                  <h3 style={{ fontSize: "16px", fontWeight: "600", color: "#ffffff", margin: "0 0 4px 0", letterSpacing: "-0.01em" }}>Post New Project</h3>
-                  <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>Publish a project listing with custom scope and budget</p>
+                  <h3 style={{ fontSize: "16px", fontWeight: "600", color: colors.textPrimary, margin: "0 0 4px 0", letterSpacing: "-0.01em" }}>Post New Project</h3>
+                  <p style={{ fontSize: "13px", color: colors.textMuted, margin: 0 }}>Publish a project listing with custom scope and budget</p>
                 </div>
 
                 <form onSubmit={handlePostJob} style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "14px" }}>
@@ -496,7 +544,7 @@ export default function App() {
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
                       required
-                      style={{ padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.09)", borderRadius: "7px", color: "#ffffff", fontSize: "13px" }}
+                      style={{ padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px" }}
                     />
                     <textarea
                       placeholder="Technical scope, requirements, deliverables..."
@@ -504,7 +552,7 @@ export default function App() {
                       onChange={(e) => setJobDesc(e.target.value)}
                       required
                       rows="3"
-                      style={{ padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.09)", borderRadius: "7px", color: "#ffffff", fontSize: "13px", resize: "none" }}
+                      style={{ padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px", resize: "none" }}
                     />
                   </div>
 
@@ -515,13 +563,13 @@ export default function App() {
                       value={jobBudget}
                       onChange={(e) => setJobBudget(e.target.value)}
                       required
-                      style={{ padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.09)", borderRadius: "7px", color: "#ffffff", fontSize: "13px" }}
+                      style={{ padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px" }}
                     />
                     <button
                       type="submit"
                       style={{
                         padding: "13px",
-                        background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                        background: colors.accentBtn,
                         color: "#ffffff", fontWeight: "600", border: "none", borderRadius: "7px", cursor: "pointer", fontSize: "13px",
                         boxShadow: "0 4px 14px rgba(99, 102, 241, 0.35)"
                       }}
@@ -540,10 +588,10 @@ export default function App() {
                   onClick={() => setActiveTab("all")}
                   style={{
                     padding: "7px 14px", borderRadius: "7px", fontSize: "13px", fontWeight: "500", cursor: "pointer",
-                    backgroundColor: activeTab === "all" ? "rgba(99, 102, 241, 0.15)" : "transparent",
-                    color: activeTab === "all" ? "#a5b4fc" : "#64748b",
+                    backgroundColor: activeTab === "all" ? (isDark ? "rgba(99, 102, 241, 0.15)" : "#e0e7ff") : "transparent",
+                    color: activeTab === "all" ? (isDark ? "#a5b4fc" : "#4338ca") : colors.textMuted,
                     border: "1px solid",
-                    borderColor: activeTab === "all" ? "rgba(99, 102, 241, 0.3)" : "transparent"
+                    borderColor: activeTab === "all" ? (isDark ? "rgba(99, 102, 241, 0.3)" : "#c7d2fe") : "transparent"
                   }}
                 >
                   All Projects ({jobs.length})
@@ -553,10 +601,10 @@ export default function App() {
                     onClick={() => setActiveTab("my-jobs")}
                     style={{
                       padding: "7px 14px", borderRadius: "7px", fontSize: "13px", fontWeight: "500", cursor: "pointer",
-                      backgroundColor: activeTab === "my-jobs" ? "rgba(99, 102, 241, 0.15)" : "transparent",
-                      color: activeTab === "my-jobs" ? "#a5b4fc" : "#64748b",
+                      backgroundColor: activeTab === "my-jobs" ? (isDark ? "rgba(99, 102, 241, 0.15)" : "#e0e7ff") : "transparent",
+                      color: activeTab === "my-jobs" ? (isDark ? "#a5b4fc" : "#4338ca") : colors.textMuted,
                       border: "1px solid",
-                      borderColor: activeTab === "my-jobs" ? "rgba(99, 102, 241, 0.3)" : "transparent"
+                      borderColor: activeTab === "my-jobs" ? (isDark ? "rgba(99, 102, 241, 0.3)" : "#c7d2fe") : "transparent"
                     }}
                   >
                     My Postings
@@ -571,56 +619,56 @@ export default function App() {
                   placeholder="Filter by keyword or stack..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ flex: 2, padding: "9px 13px", backgroundColor: "#0e1017", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "7px", color: "#ffffff", fontSize: "13px" }}
+                  style={{ flex: 2, padding: "9px 13px", backgroundColor: colors.cardBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px" }}
                 />
                 <input
                   type="number"
                   placeholder="Min PKR"
                   value={minBudgetFilter}
                   onChange={(e) => setMinBudgetFilter(e.target.value)}
-                  style={{ flex: 1, padding: "9px 13px", backgroundColor: "#0e1017", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "7px", color: "#ffffff", fontSize: "13px" }}
+                  style={{ flex: 1, padding: "9px 13px", backgroundColor: colors.cardBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px" }}
                 />
               </div>
             </div>
 
             {/* JOBS GRID */}
             {displayedJobs.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "70px 20px", border: "1px dashed rgba(255, 255, 255, 0.1)", borderRadius: "10px" }}>
-                <p style={{ color: "#64748b", fontSize: "14px", margin: 0 }}>No active listings match your parameters.</p>
+              <div style={{ textAlign: "center", padding: "70px 20px", border: `1px dashed ${colors.border}`, borderRadius: "10px" }}>
+                <p style={{ color: colors.textMuted, fontSize: "14px", margin: 0 }}>No active listings match your parameters.</p>
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: "18px" }}>
                 {displayedJobs.map((job) => (
                   <article key={job.id} style={{
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                    backgroundColor: "#0e1017",
+                    border: `1px solid ${colors.border}`,
+                    backgroundColor: colors.cardBg,
                     padding: "22px", borderRadius: "10px",
                     display: "flex", flexDirection: "column", justifyContent: "space-between",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.35)",
-                    transition: "border-color 0.15s ease"
+                    boxShadow: colors.cardShadow,
+                    transition: "all 0.2s ease"
                   }}>
                     <div>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", marginBottom: "8px" }}>
-                        <h4 style={{ margin: 0, fontSize: "16px", fontWeight: "600", color: "#ffffff", lineHeight: "1.3" }}>{job.title}</h4>
+                        <h4 style={{ margin: 0, fontSize: "16px", fontWeight: "600", color: colors.textPrimary, lineHeight: "1.3" }}>{job.title}</h4>
                         <span style={{
                           fontSize: "10px", fontWeight: "600", textTransform: "uppercase", padding: "3px 8px", borderRadius: "5px",
                           border: job.status === "open" ? "1px solid rgba(16, 185, 129, 0.4)" : job.status === "in_progress" ? "1px solid rgba(245, 158, 11, 0.4)" : "1px solid rgba(99, 102, 241, 0.4)",
-                          color: job.status === "open" ? "#6ee7b7" : job.status === "in_progress" ? "#fcd34d" : "#a5b4fc",
-                          backgroundColor: job.status === "open" ? "rgba(16, 185, 129, 0.1)" : job.status === "in_progress" ? "rgba(245, 158, 11, 0.1)" : "rgba(99, 102, 241, 0.1)"
+                          color: job.status === "open" ? (isDark ? "#6ee7b7" : "#059669") : job.status === "in_progress" ? (isDark ? "#fcd34d" : "#d97706") : (isDark ? "#a5b4fc" : "#4f46e5"),
+                          backgroundColor: job.status === "open" ? "rgba(16, 185, 129, 0.08)" : job.status === "in_progress" ? "rgba(245, 158, 11, 0.08)" : "rgba(99, 102, 241, 0.08)"
                         }}>
                           {job.status.replace("_", " ")}
                         </span>
                       </div>
-                      <p style={{ color: "#94a3b8", fontSize: "13px", lineHeight: "1.55", margin: "10px 0 18px 0" }}>{job.description}</p>
+                      <p style={{ color: colors.textSecondary, fontSize: "13px", lineHeight: "1.55", margin: "10px 0 18px 0" }}>{job.description}</p>
                     </div>
 
-                    <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)", paddingTop: "16px", marginTop: "10px" }}>
+                    <div style={{ borderTop: `1px solid ${colors.border}`, paddingTop: "16px", marginTop: "10px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "14px" }}>
                         <div>
-                          <span style={{ fontSize: "10px", color: "#64748b", textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.05em" }}>Allocated Budget</span>
-                          <div style={{ fontSize: "20px", fontWeight: "700", color: "#34d399", letterSpacing: "-0.02em" }}>PKR {job.budget.toLocaleString()}</div>
+                          <span style={{ fontSize: "10px", color: colors.textMuted, textTransform: "uppercase", fontWeight: "600", letterSpacing: "0.05em" }}>Allocated Budget</span>
+                          <div style={{ fontSize: "20px", fontWeight: "700", color: colors.budgetColor, letterSpacing: "-0.02em" }}>PKR {job.budget.toLocaleString()}</div>
                         </div>
-                        <div style={{ textAlign: "right", fontSize: "12px", color: "#64748b" }}>
+                        <div style={{ textAlign: "right", fontSize: "12px", color: colors.textMuted }}>
                           <span>{job.proposals_count || 0} proposals</span>
                         </div>
                       </div>
@@ -631,7 +679,7 @@ export default function App() {
                           onClick={() => setSelectedJobId(job.id)}
                           style={{
                             width: "100%", padding: "10px",
-                            background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                            background: colors.accentBtn,
                             color: "#ffffff", fontWeight: "600", border: "none", borderRadius: "7px", cursor: "pointer", fontSize: "13px",
                             boxShadow: "0 4px 12px rgba(99, 102, 241, 0.25)"
                           }}
@@ -647,8 +695,9 @@ export default function App() {
                             onClick={() => fetchProposalsForJob(job.id)}
                             style={{
                               flex: 1, padding: "9px",
-                              backgroundColor: "rgba(99, 102, 241, 0.12)", color: "#c7d2fe",
-                              border: "1px solid rgba(99, 102, 241, 0.25)", borderRadius: "7px", cursor: "pointer", fontSize: "12px", fontWeight: "600"
+                              backgroundColor: isDark ? "rgba(99, 102, 241, 0.12)" : "#e0e7ff",
+                              color: isDark ? "#c7d2fe" : "#3730a3",
+                              border: `1px solid ${isDark ? "rgba(99, 102, 241, 0.25)" : "#c7d2fe"}`, borderRadius: "7px", cursor: "pointer", fontSize: "12px", fontWeight: "600"
                             }}
                           >
                             Review Bids ({job.proposals_count || 0})
@@ -657,7 +706,7 @@ export default function App() {
                             onClick={() => handleDeleteJob(job.id)}
                             style={{
                               padding: "9px 14px", backgroundColor: "transparent", color: "#ef4444",
-                              border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "7px", cursor: "pointer", fontSize: "12px"
+                              border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "7px", cursor: "pointer", fontSize: "12px"
                             }}
                             title="Delete"
                           >
@@ -673,34 +722,34 @@ export default function App() {
 
             {/* FREELANCER PROPOSAL MODAL */}
             {selectedJobId && (
-              <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.8)", backdropFilter: "blur(6px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 100 }}>
-                <div style={{ backgroundColor: "#0e1017", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "32px", borderRadius: "12px", width: "90%", maxWidth: "480px", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)" }}>
+              <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: colors.modalOverlay, backdropFilter: "blur(6px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 100 }}>
+                <div style={{ backgroundColor: colors.cardBg, border: `1px solid ${colors.border}`, padding: "32px", borderRadius: "12px", width: "90%", maxWidth: "480px", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
                   <div style={{ marginBottom: "20px" }}>
-                    <h3 style={{ margin: "0 0 4px 0", fontSize: "18px", fontWeight: "600", color: "#ffffff" }}>Submit Proposal</h3>
-                    <p style={{ margin: 0, fontSize: "12px", color: "#64748b" }}>Listing ID #{selectedJobId}</p>
+                    <h3 style={{ margin: "0 0 4px 0", fontSize: "18px", fontWeight: "600", color: colors.textPrimary }}>Submit Proposal</h3>
+                    <p style={{ margin: 0, fontSize: "12px", color: colors.textMuted }}>Listing ID #{selectedJobId}</p>
                   </div>
 
                   <form onSubmit={handleSubmitBid} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                     <div>
-                      <label style={{ fontSize: "11px", fontWeight: "600", color: "#94a3b8", display: "block", marginBottom: "6px", letterSpacing: "0.04em" }}>BID AMOUNT (PKR)</label>
+                      <label style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, display: "block", marginBottom: "6px" }}>BID AMOUNT (PKR)</label>
                       <input
                         type="number"
                         placeholder="e.g. 65000"
                         value={bidAmount}
                         onChange={(e) => setBidAmount(e.target.value)}
                         required
-                        style={{ width: "100%", padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "7px", color: "#ffffff", fontSize: "13px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px", boxSizing: "border-box" }}
                       />
                     </div>
                     <div>
-                      <label style={{ fontSize: "11px", fontWeight: "600", color: "#94a3b8", display: "block", marginBottom: "6px", letterSpacing: "0.04em" }}>COVER LETTER</label>
+                      <label style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, display: "block", marginBottom: "6px" }}>COVER LETTER</label>
                       <textarea
                         placeholder="Technical approach, delivery timeline, relevant milestones..."
                         value={coverLetter}
                         onChange={(e) => setCoverLetter(e.target.value)}
                         required
                         rows="5"
-                        style={{ width: "100%", padding: "11px 14px", backgroundColor: "#060709", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "7px", color: "#ffffff", fontSize: "13px", boxSizing: "border-box", resize: "none" }}
+                        style={{ width: "100%", padding: "11px 14px", backgroundColor: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: "7px", color: colors.textPrimary, fontSize: "13px", boxSizing: "border-box", resize: "none" }}
                       />
                     </div>
                     <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
@@ -708,7 +757,7 @@ export default function App() {
                         type="submit"
                         style={{
                           flex: 1, padding: "12px",
-                          background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                          background: colors.accentBtn,
                           color: "#ffffff", fontWeight: "600", border: "none", borderRadius: "7px", cursor: "pointer", fontSize: "13px",
                           boxShadow: "0 4px 14px rgba(99, 102, 241, 0.35)"
                         }}
@@ -718,7 +767,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setSelectedJobId(null)}
-                        style={{ padding: "12px 18px", backgroundColor: "transparent", color: "#94a3b8", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "7px", cursor: "pointer", fontSize: "13px" }}
+                        style={{ padding: "12px 18px", backgroundColor: "transparent", color: colors.textSecondary, border: `1px solid ${colors.border}`, borderRadius: "7px", cursor: "pointer", fontSize: "13px" }}
                       >
                         Cancel
                       </button>
@@ -730,16 +779,16 @@ export default function App() {
 
             {/* CANDIDATE REVIEW MODAL (CLIENT) */}
             {viewingJobProposals && (
-              <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.8)", backdropFilter: "blur(6px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 100 }}>
-                <div style={{ backgroundColor: "#0e1017", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "32px", borderRadius: "12px", width: "90%", maxWidth: "620px", maxHeight: "80vh", overflowY: "auto", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)" }}>
+              <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: colors.modalOverlay, backdropFilter: "blur(6px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 100 }}>
+                <div style={{ backgroundColor: colors.cardBg, border: `1px solid ${colors.border}`, padding: "32px", borderRadius: "12px", width: "90%", maxWidth: "620px", maxHeight: "80vh", overflowY: "auto", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "22px" }}>
                     <div>
-                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", fontWeight: "600", color: "#ffffff" }}>Candidate Proposals</h3>
-                      <p style={{ margin: 0, fontSize: "12px", color: "#64748b" }}>Listing ID #{viewingJobProposals}</p>
+                      <h3 style={{ margin: "0 0 2px 0", fontSize: "18px", fontWeight: "600", color: colors.textPrimary }}>Candidate Proposals</h3>
+                      <p style={{ margin: 0, fontSize: "12px", color: colors.textMuted }}>Listing ID #{viewingJobProposals}</p>
                     </div>
                     <button
                       onClick={() => setViewingJobProposals(null)}
-                      style={{ background: "none", border: "none", color: "#64748b", fontSize: "22px", cursor: "pointer" }}
+                      style={{ background: "none", border: "none", color: colors.textMuted, fontSize: "22px", cursor: "pointer" }}
                     >
                       ✕
                     </button>
@@ -747,24 +796,24 @@ export default function App() {
 
                   {proposalsList.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "40px 0" }}>
-                      <p style={{ color: "#64748b", fontSize: "13px" }}>No candidate proposals submitted yet.</p>
+                      <p style={{ color: colors.textMuted, fontSize: "13px" }}>No candidate proposals submitted yet.</p>
                     </div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                       {proposalsList.map((p) => (
-                        <div key={p.proposal_id} style={{ border: "1px solid rgba(255, 255, 255, 0.08)", backgroundColor: "#060709", padding: "18px", borderRadius: "8px" }}>
+                        <div key={p.proposal_id} style={{ border: `1px solid ${colors.border}`, backgroundColor: colors.inputBg, padding: "18px", borderRadius: "8px" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                             <div>
-                              <span style={{ fontSize: "15px", fontWeight: "600", color: "#ffffff" }}>{p.freelancer}</span>
-                              <span style={{ fontSize: "12px", color: "#64748b", display: "block" }}>{p.email}</span>
+                              <span style={{ fontSize: "15px", fontWeight: "600", color: colors.textPrimary }}>{p.freelancer}</span>
+                              <span style={{ fontSize: "12px", color: colors.textMuted, display: "block" }}>{p.email}</span>
                             </div>
                             <div style={{ textAlign: "right" }}>
-                              <span style={{ fontSize: "10px", color: "#64748b", textTransform: "uppercase" }}>Proposed Bid</span>
-                              <div style={{ fontSize: "17px", fontWeight: "700", color: "#34d399" }}>PKR {p.bid_amount.toLocaleString()}</div>
+                              <span style={{ fontSize: "10px", color: colors.textMuted, textTransform: "uppercase" }}>Proposed Bid</span>
+                              <div style={{ fontSize: "17px", fontWeight: "700", color: colors.budgetColor }}>PKR {p.bid_amount.toLocaleString()}</div>
                             </div>
                           </div>
 
-                          <p style={{ fontSize: "13px", color: "#cbd5e1", lineHeight: "1.55", margin: "12px 0 16px 0", backgroundColor: "#0e1017", padding: "12px 14px", borderRadius: "6px", border: "1px solid rgba(255, 255, 255, 0.05)" }}>
+                          <p style={{ fontSize: "13px", color: colors.textSecondary, lineHeight: "1.55", margin: "12px 0 16px 0", backgroundColor: colors.cardBg, padding: "12px 14px", borderRadius: "6px", border: `1px solid ${colors.border}` }}>
                             {p.cover_letter}
                           </p>
 
@@ -772,8 +821,8 @@ export default function App() {
                             <span style={{
                               fontSize: "10px", fontWeight: "600", textTransform: "uppercase", padding: "3px 8px", borderRadius: "4px",
                               border: p.status === "accepted" ? "1px solid rgba(16, 185, 129, 0.4)" : p.status === "rejected" ? "1px solid rgba(239, 68, 68, 0.4)" : "1px solid rgba(245, 158, 11, 0.4)",
-                              color: p.status === "accepted" ? "#6ee7b7" : p.status === "rejected" ? "#fca5a5" : "#fcd34d",
-                              backgroundColor: p.status === "accepted" ? "rgba(16, 185, 129, 0.1)" : p.status === "rejected" ? "rgba(239, 68, 68, 0.1)" : "rgba(245, 158, 11, 0.1)"
+                              color: p.status === "accepted" ? (isDark ? "#6ee7b7" : "#059669") : p.status === "rejected" ? (isDark ? "#fca5a5" : "#dc2626") : (isDark ? "#fcd34d" : "#d97706"),
+                              backgroundColor: p.status === "accepted" ? "rgba(16, 185, 129, 0.08)" : p.status === "rejected" ? "rgba(239, 68, 68, 0.08)" : "rgba(245, 158, 11, 0.08)"
                             }}>
                               {p.status}
                             </span>
@@ -794,8 +843,8 @@ export default function App() {
                                 <button
                                   onClick={() => handleRejectProposal(p.proposal_id)}
                                   style={{
-                                    padding: "8px 16px", backgroundColor: "transparent", color: "#fca5a5",
-                                    border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "6px", cursor: "pointer", fontSize: "12px"
+                                    padding: "8px 16px", backgroundColor: "transparent", color: isDark ? "#fca5a5" : "#dc2626",
+                                    border: `1px solid ${isDark ? "rgba(239, 68, 68, 0.3)" : "#fca5a5"}`, borderRadius: "6px", cursor: "pointer", fontSize: "12px"
                                   }}
                                 >
                                   Decline
